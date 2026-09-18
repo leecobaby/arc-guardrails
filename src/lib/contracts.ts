@@ -19,6 +19,7 @@ export const arcGuardVaultAbi = parseAbi([
   "function unpause()",
   "function transferOwnership(address newOwner)",
   "function acceptOwnership()",
+  "function renounceOwnership()",
   "event Spent(address indexed agent, address indexed recipient, uint256 amount, bytes32 indexed paymentId, uint256 dayId)",
   "event Deposited(address indexed sender, uint256 amount)",
   "event PolicyUpdated(uint256 maxPerTransaction, uint256 dailyLimit, uint64 expiresAt, bool allowlistOnly)",

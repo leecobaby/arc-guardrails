@@ -42,6 +42,7 @@ import {
   useDisconnect,
   usePublicClient,
   useReadContracts,
+  useBalance,
   useSwitchChain,
   useWriteContract,
 } from "wagmi";
@@ -193,6 +194,12 @@ export function Dashboard() {
     | readonly [bigint, bigint, bigint]
     | undefined;
   const vaultBalance = (reads?.[6]?.result as bigint | undefined) ?? 0n;
+
+  const { data: agentGas } = useBalance({
+    address: agent,
+    chainId: selectedChainId,
+    query: { enabled: Boolean(agent) },
+  });
 
   const displayBalance = isPreview ? 12_450_000n : vaultBalance;
   const displaySpent = isPreview ? 250_000n : dayState?.[1] ?? 0n;
@@ -567,7 +574,11 @@ export function Dashboard() {
             icon={<Bot size={16} />}
             label="Active agent"
             value={isPreview ? "0x71C4…976F" : short(agent)}
-            detail={isAgent ? "Connected as agent" : "Policy executor"}
+            detail={
+              isPreview
+                ? "Gas buffer 0.35 USDC"
+                : `Gas buffer ${formatUnits(agentGas?.value ?? 0n, 18)} USDC`
+            }
             mono
           />
         </section>

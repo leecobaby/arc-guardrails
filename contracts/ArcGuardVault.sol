@@ -159,7 +159,7 @@ contract ArcGuardVault is Ownable2Step, Pausable, ReentrancyGuard {
         remaining = policy.dailyLimit > spent ? policy.dailyLimit - spent : 0;
     }
 
-    function renounceOwnership() public view override onlyOwner {
+    function renounceOwnership() public override onlyOwner {
         revert RenounceOwnershipDisabled();
     }
 }
