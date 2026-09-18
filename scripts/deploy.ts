@@ -18,16 +18,16 @@ if (!isAddress(initialOwner) || !isAddress(usdcAddress)) {
   throw new Error("INITIAL_OWNER_ADDRESS and USDC_ADDRESS must be valid EVM addresses");
 }
 
-const vault = await viem.deployContract("ArcGuardVault", [
-  getAddress(initialOwner),
-  getAddress(usdcAddress),
-]);
+const { contract: vault, deploymentTransaction } =
+  await viem.sendDeploymentTransaction("ArcGuardVault", [
+    getAddress(initialOwner),
+    getAddress(usdcAddress),
+  ]);
 
 const publicClient = await viem.getPublicClient();
-const deploymentTransaction = vault.deploymentTransaction;
-const receipt = deploymentTransaction
-  ? await publicClient.waitForTransactionReceipt({ hash: deploymentTransaction.hash })
-  : undefined;
+const receipt = await publicClient.waitForTransactionReceipt({
+  hash: deploymentTransaction.hash,
+});
 
 const deployment = {
   network: networkName,
@@ -36,8 +36,8 @@ const deployment = {
   deployer: deployer.account.address,
   initialOwner: getAddress(initialOwner),
   usdc: getAddress(usdcAddress),
-  transactionHash: deploymentTransaction?.hash ?? null,
-  blockNumber: receipt?.blockNumber.toString() ?? null,
+  transactionHash: deploymentTransaction.hash,
+  blockNumber: receipt.blockNumber.toString(),
   deployedAt: new Date().toISOString(),
 };
 

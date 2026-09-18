@@ -23,7 +23,7 @@ describe("ArcGuardVault", async function () {
     await vault.write.deposit([usdc(1_000)]);
     await vault.write.setAgent([agent.account.address]);
     await vault.write.setRecipient([recipient.account.address, true]);
-    await vault.write.setPolicy([usdc(25), usdc(100), 0, true]);
+    await vault.write.setPolicy([usdc(25), usdc(100), 0n, true]);
 
     return { token, vault };
   }

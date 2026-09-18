@@ -1,0 +1,25 @@
+import { parseAbi } from "viem";
+
+export const arcGuardVaultAbi = parseAbi([
+  "function owner() view returns (address)",
+  "function pendingOwner() view returns (address)",
+  "function agent() view returns (address)",
+  "function paused() view returns (bool)",
+  "function policy() view returns (uint256 maxPerTransaction, uint256 dailyLimit, uint64 expiresAt, bool allowlistOnly)",
+  "function currentDayState() view returns (uint256 dayId, uint256 spent, uint256 remaining)",
+  "function allowedRecipients(address recipient) view returns (bool)",
+  "function usedPaymentIds(bytes32 paymentId) view returns (bool)",
+  "function deposit(uint256 amount)",
+  "function spend(address recipient, uint256 amount, bytes32 paymentId)",
+  "function setAgent(address newAgent)",
+  "function setPolicy(uint256 maxPerTransaction, uint256 dailyLimit, uint64 expiresAt, bool allowlistOnly)",
+  "function setRecipient(address recipient, bool allowed)",
+  "function withdraw(address recipient, uint256 amount)",
+  "function pause()",
+  "function unpause()",
+  "function transferOwnership(address newOwner)",
+  "function acceptOwnership()",
+  "event Spent(address indexed agent, address indexed recipient, uint256 amount, bytes32 indexed paymentId, uint256 dayId)",
+  "event Deposited(address indexed sender, uint256 amount)",
+  "event PolicyUpdated(uint256 maxPerTransaction, uint256 dailyLimit, uint64 expiresAt, bool allowlistOnly)",
+]);
