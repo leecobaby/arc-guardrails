@@ -51,7 +51,7 @@ export const supportedChains = [arcTestnet, arc] as const;
 
 export const wagmiConfig = createConfig({
   chains: supportedChains,
-  connectors: [injected()],
+  connectors: [injected({ target: "metaMask" }), injected()],
   multiInjectedProviderDiscovery: true,
   ssr: true,
   transports: {

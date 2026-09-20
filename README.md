@@ -17,7 +17,7 @@ Source repository: [github.com/leecobaby/arc-guardrails](https://github.com/leec
 ## What ships
 
 - `ArcGuardVault`: non-upgradeable USDC vault with an allowlist, per-transaction limit, UTC daily limit, policy expiry, replay-safe payment IDs, pause/recovery, agent rotation, and two-step ownership transfer.
-- Operations console: Arc testnet/mainnet switching, wallet connection, vault funding, policy and recipient controls, agent payments, activity history, pausing, and ownership transfer.
+- Operations console: Arc testnet/mainnet switching, MetaMask and other injected-wallet selection, vault funding, policy and recipient controls, agent payments, indexed activity history, pausing, and ownership transfer.
 - Authenticated agent endpoint: `POST /api/agent/pay` signs with a server-only agent key and lets the contract accept or reject the payment.
 - Contract tests for authorization, allowlists, replay protection, limits, day rollover, expiry, emergency withdrawal, agent rotation, and ownership transfer.
 
@@ -61,6 +61,8 @@ node scripts/create-temp-wallets.mjs
 ```
 
 The script refuses to overwrite an existing `.env.local`, writes secrets with mode `0600`, and prints only public addresses. All `.env*` files except `.env.example` are Git-ignored.
+
+For the activity ledger, set `BLOCKSCOUT_PRO_API_KEY` in `.env.local` and in your hosting provider's server-side environment. The key is sent only from `/api/activity` to Blockscout MCP, never bundled into the browser. The ledger reads the latest 12 `Spent` events from Blockscout's full indexed contract history, so it is not limited by the public RPC's recent-block log window. Do not prefix this variable with `NEXT_PUBLIC_`.
 
 ## Networks
 

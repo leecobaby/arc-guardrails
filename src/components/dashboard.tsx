@@ -20,7 +20,6 @@ import {
   Settings2,
   ShieldCheck,
   UserRoundCog,
-  Wallet,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { FormEvent, useMemo, useState } from "react";
@@ -38,8 +37,6 @@ import {
 import {
   useAccount,
   useChainId,
-  useConnect,
-  useDisconnect,
   usePublicClient,
   useReadContracts,
   useBalance,
@@ -54,6 +51,7 @@ import {
   explorerUrl,
 } from "@/lib/arc";
 import { arcGuardVaultAbi } from "@/lib/contracts";
+import { WalletConnect } from "@/components/wallet-connect";
 
 type Panel = "fund" | "policy" | "recipient" | "pay" | "owner";
 type Notice = {
@@ -118,8 +116,6 @@ export function Dashboard() {
   const [copied, setCopied] = useState(false);
 
   const { address, isConnected } = useAccount();
-  const { connect, connectors, isPending: isConnecting } = useConnect();
-  const { disconnect } = useDisconnect();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
 
@@ -207,32 +203,32 @@ export function Dashboard() {
   const displayPerTx = isPreview ? 500_000n : policy?.[0] ?? 0n;
   const displayDaily = isPreview ? 2_000_000n : policy?.[1] ?? 0n;
 
-  const { data: activities = [], refetch: refetchActivities } = useQuery({
+  const {
+    data: activities = [],
+    isPending: isActivityPending,
+    isError: isActivityError,
+    refetch: refetchActivities,
+  } = useQuery({
     queryKey: ["vault-activity", selectedChainId, vaultAddress],
-    enabled: Boolean(vaultAddress && publicClient),
-    refetchInterval: 12_000,
+    enabled: Boolean(vaultAddress),
+    refetchInterval: 30_000,
     queryFn: async (): Promise<SpendRow[]> => {
-      if (!vaultAddress || !publicClient) return [];
-      const latest = await publicClient.getBlockNumber();
-      const fromBlock = latest > 50_000n ? latest - 50_000n : 0n;
-      const logs = await publicClient.getContractEvents({
-        address: vaultAddress,
-        abi: arcGuardVaultAbi,
-        eventName: "Spent",
-        fromBlock,
-        toBlock: "latest",
-        strict: true,
-      });
-      return logs
-        .slice(-12)
-        .reverse()
-        .map((log) => ({
-          hash: log.transactionHash,
-          recipient: log.args.recipient,
-          amount: log.args.amount,
-          paymentId: log.args.paymentId,
-          blockNumber: log.blockNumber,
-        }));
+      const response = await fetch(`/api/activity?chainId=${selectedChainId}`);
+      if (!response.ok) throw new Error("Activity index is unavailable.");
+      const result = (await response.json()) as {
+        activities: Array<{
+          hash: string;
+          recipient: Address;
+          amount: string;
+          paymentId: string;
+          blockNumber: string;
+        }>;
+      };
+      return result.activities.map((row) => ({
+        ...row,
+        amount: BigInt(row.amount),
+        blockNumber: BigInt(row.blockNumber),
+      }));
     },
   });
 
@@ -493,23 +489,7 @@ export function Dashboard() {
                 Mainnet
               </button>
             </div>
-            {isConnected ? (
-              <button
-                className="wallet-button connected"
-                onClick={() => disconnect()}
-              >
-                <span className="wallet-led" /> {short(address)}
-              </button>
-            ) : (
-              <button
-                className="wallet-button"
-                onClick={() => connect({ connector: connectors[0] })}
-                disabled={isConnecting || !connectors[0]}
-              >
-                <Wallet size={16} />
-                {isConnecting ? "Connecting" : "Connect wallet"}
-              </button>
-            )}
+            <WalletConnect chainId={selectedChainId} />
           </div>
         </header>
 
@@ -609,7 +589,20 @@ export function Dashboard() {
                   {rows.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="empty-row">
-                        No agent payments in the indexed window.
+                        {isActivityPending && !isPreview
+                          ? "Loading agent payments..."
+                          : isActivityError
+                            ? "Activity is temporarily unavailable."
+                            : "No agent payments yet."}
+                        {isActivityError && (
+                          <button
+                            type="button"
+                            className="activity-retry"
+                            onClick={() => void refetchActivities()}
+                          >
+                            Retry
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ) : (
