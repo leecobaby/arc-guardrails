@@ -4,6 +4,9 @@ Arc Guardrails is an onchain USDC policy vault for autonomous agents. An owner f
 
 The project targets the [Arc Microgrants program](https://community.arc.io/public/events/arc-microgrants-f8tijfjhyq). It is new work, open source, and designed for a small real Arc mainnet deployment.
 
+Live testnet console: [arc-guardrails.vercel.app](https://arc-guardrails.vercel.app)  
+Source repository: [github.com/leecobaby/arc-guardrails](https://github.com/leecobaby/arc-guardrails)
+
 ## Why Arc
 
 - Arc uses USDC for gas, so owners and agents do not need a separate volatile gas token.

@@ -21,13 +21,13 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 
 ## Submission fields
 
-- Live application: `TBD`
-- Public repository: `TBD`
+- Live application: https://arc-guardrails.vercel.app
+- Public repository: https://github.com/leecobaby/arc-guardrails
 - Arc mainnet contract: `TBD`
 - Example mainnet transaction: `TBD`
 - Arc testnet contract (development only): `0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7`
 - Arc testnet payment (development only): `0xca34972b022d5c7983a9982e4e39c05233afdd8c25d46244381014ea1f19328f`
-- Public builder profile: `TBD`
+- Public builder profile: `https://github.com/leecobaby`
 - Payout wallet on Arc: `TBD`
 
 ## Eligibility checklist
@@ -37,6 +37,7 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 - [x] Arc-specific contract and USDC integration
 - [x] Test suite, security notes, and two-step ownership handoff
 - [x] Testnet Vault configured and real restricted payment verified
+- [x] Public repository and live testnet console
 - [ ] Deploy contract on Arc mainnet
 - [ ] Execute and link a small real Arc USDC transaction
 - [ ] Publish repository
