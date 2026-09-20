@@ -120,6 +120,8 @@ The contract inherits OpenZeppelin `Ownable2Step`:
 2. `pendingOwner` updates, but the current owner retains control.
 3. The specified address calls `acceptOwnership()`.
 
+The V1 testnet transfer is currently pending for the designated wallet. Open the verified contract in the [Arc Testnet Explorer](https://explorer.testnet.arc.io/address/0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7?tab=contract), connect the designated wallet, and call `acceptOwnership()` once. The current owner remains the deployer until that transaction confirms.
+
 Renouncing ownership is intentionally disabled so funds cannot be stranded. The initial temporary owner can therefore be replaced by the user's permanent address after review.
 
 ## Verification

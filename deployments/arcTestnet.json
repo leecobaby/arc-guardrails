@@ -7,5 +7,9 @@
   "usdc": "0x3600000000000000000000000000000000000000",
   "transactionHash": "0x1b3a8b4ee2b1ff2d2ae20da5ffc19c39e9605468f4d672ef3fad7008553d1876",
   "blockNumber": "63084972",
-  "deployedAt": "2026-09-20T12:14:01.327Z"
+  "deployedAt": "2026-09-20T12:14:01.327Z",
+  "pendingOwner": "0xE3608F65BD6D8b4f88b889a778D97a3F02e23d1A",
+  "ownershipTransferTransaction": "0x6f852826b4352484a0556ac8e8f50b3ac7b7d0e259251278513e446087417274",
+  "verified": true,
+  "verifiedUrl": "https://explorer.testnet.arc.io/address/0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7?tab=contract"
 }

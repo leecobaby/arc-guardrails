@@ -19,7 +19,8 @@
     "deploy:mainnet": "hardhat run scripts/deploy.ts --network arcMainnet",
     "testnet:configure": "node scripts/configure-testnet.mjs",
     "testnet:payment": "node scripts/testnet-payment.mjs",
-    "testnet:merchant": "node scripts/ensure-merchant-address.mjs"
+    "testnet:merchant": "node scripts/ensure-merchant-address.mjs",
+    "testnet:transfer-owner": "node scripts/transfer-testnet-owner.mjs"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.6.1",
