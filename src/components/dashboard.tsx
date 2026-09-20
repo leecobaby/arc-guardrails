@@ -213,7 +213,9 @@ export function Dashboard() {
     enabled: Boolean(vaultAddress),
     refetchInterval: 30_000,
     queryFn: async (): Promise<SpendRow[]> => {
-      const response = await fetch(`/api/activity?chainId=${selectedChainId}`);
+      const response = await fetch(`/api/activity?chainId=${selectedChainId}`, {
+        signal: AbortSignal.timeout(8_000),
+      });
       if (!response.ok) throw new Error("Activity index is unavailable.");
       const result = (await response.json()) as {
         activities: Array<{

@@ -18,18 +18,19 @@ export function WalletConnect({ chainId }: WalletConnectProps) {
 
   const walletOptions = useMemo(() => {
     const discoveredMetaMask = connectors.find(
-      (connector) => connector.id === "io.metamask",
+      (connector) =>
+        connector.id === "metaMaskSDK" ||
+        connector.id === "io.metamask" ||
+        connector.name === "MetaMask",
     );
-    const metaMask =
-      discoveredMetaMask ??
-      connectors.find((connector) => connector.id === "metaMask");
     const others = connectors.filter(
       (connector) =>
-        connector !== metaMask &&
-        connector.id !== "metaMask" &&
-        connector.id !== "io.metamask",
+        connector !== discoveredMetaMask &&
+        connector.id !== "metaMaskSDK" &&
+        connector.id !== "io.metamask" &&
+        connector.name !== "MetaMask",
     );
-    return metaMask ? [metaMask, ...others] : others;
+    return discoveredMetaMask ? [discoveredMetaMask, ...others] : others;
   }, [connectors]);
 
   async function chooseWallet(connector: (typeof connectors)[number]) {

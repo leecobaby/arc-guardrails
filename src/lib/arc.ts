@@ -1,5 +1,6 @@
 import { createConfig, http } from "wagmi";
 import { injected } from "wagmi/connectors/injected";
+import { metaMask } from "wagmi/connectors/metaMask";
 import { defineChain } from "viem";
 
 export const arc = defineChain({
@@ -51,7 +52,15 @@ export const supportedChains = [arcTestnet, arc] as const;
 
 export const wagmiConfig = createConfig({
   chains: supportedChains,
-  connectors: [injected({ target: "metaMask" }), injected()],
+  connectors: [
+    metaMask({
+      dapp: {
+        name: "Arc Guardrails",
+        url: "https://arc-guardrails.vercel.app",
+      },
+    }),
+    injected(),
+  ],
   multiInjectedProviderDiscovery: true,
   ssr: true,
   transports: {
