@@ -25,6 +25,8 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 - Public repository: `TBD`
 - Arc mainnet contract: `TBD`
 - Example mainnet transaction: `TBD`
+- Arc testnet contract (development only): `0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7`
+- Arc testnet payment (development only): `0xca34972b022d5c7983a9982e4e39c05233afdd8c25d46244381014ea1f19328f`
 - Public builder profile: `TBD`
 - Payout wallet on Arc: `TBD`
 
@@ -34,6 +36,7 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 - [x] Working application and public-source-ready repository
 - [x] Arc-specific contract and USDC integration
 - [x] Test suite, security notes, and two-step ownership handoff
+- [x] Testnet Vault configured and real restricted payment verified
 - [ ] Deploy contract on Arc mainnet
 - [ ] Execute and link a small real Arc USDC transaction
 - [ ] Publish repository

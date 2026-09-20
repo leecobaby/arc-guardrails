@@ -77,6 +77,16 @@ npm run deploy:testnet
 npm run deploy:mainnet
 ```
 
+After a testnet deployment, initialize the single-tenant V1 demo and send one restricted payment:
+
+```bash
+npm run testnet:merchant
+npm run testnet:configure
+npm run testnet:payment
+```
+
+`testnet:configure` transfers a small Agent gas buffer, deposits 5 test USDC, sets a 1 USDC per-payment cap, a 5 USDC daily cap, a seven-day expiry, and one merchant allowlist entry. It is for testnet validation only.
+
 After deployment, set the matching browser-visible address:
 
 ```dotenv

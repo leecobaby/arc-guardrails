@@ -16,7 +16,10 @@
     "contract:test": "hardhat test",
     "contract:coverage": "hardhat test --coverage",
     "deploy:testnet": "hardhat run scripts/deploy.ts --network arcTestnet",
-    "deploy:mainnet": "hardhat run scripts/deploy.ts --network arcMainnet"
+    "deploy:mainnet": "hardhat run scripts/deploy.ts --network arcMainnet",
+    "testnet:configure": "node scripts/configure-testnet.mjs",
+    "testnet:payment": "node scripts/testnet-payment.mjs",
+    "testnet:merchant": "node scripts/ensure-merchant-address.mjs"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.6.1",
