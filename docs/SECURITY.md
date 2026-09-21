@@ -18,7 +18,7 @@ Arc Guardrails is a prototype handling digital assets. It has not received an ex
 - Never use a valuable personal wallet as the automated agent.
 - Keep the deployer and agent keys in `.env.local` or a managed secret store.
 - `NEXT_PUBLIC_` variables are public. They must contain addresses only, never private keys or API secrets.
-- Protect `/api/agent/pay` with a high-entropy API key and network-level rate limiting in production.
+- Protect external `/api/agent/pay` callers with a high-entropy API key and network-level rate limiting in production. Console calls additionally require a fresh Owner signature bound to the selected network, vault, recipient, amount, and invoice.
 - Fund the agent only with the minimum native USDC required for gas.
 
 ## Arc-specific considerations

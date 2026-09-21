@@ -29,9 +29,7 @@ import {
   formatUnits,
   getAddress,
   isAddress,
-  keccak256,
   parseUnits,
-  stringToHex,
   zeroAddress,
 } from "viem";
 import {
@@ -40,6 +38,7 @@ import {
   usePublicClient,
   useReadContracts,
   useBalance,
+  useSignMessage,
   useSwitchChain,
   useWriteContract,
 } from "wagmi";
@@ -117,6 +116,7 @@ export function Dashboard() {
 
   const { address, isConnected } = useAccount();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
+  const { signMessageAsync } = useSignMessage();
   const { writeContractAsync } = useWriteContract();
 
   const chain = selectedChainId === arc.id ? arc : arcTestnet;
@@ -366,25 +366,69 @@ export function Dashboard() {
 
   async function handlePay(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     await execute(async () => {
-      const vault = requireWriteAccess();
       const recipient = String(form.get("recipient"));
+      const amount = String(form.get("amount")).trim();
       const invoice = String(form.get("invoice")).trim();
       if (!isAddress(recipient)) {
         throw new Error("Enter a valid recipient address.");
       }
       if (!invoice) throw new Error("Invoice reference is required.");
-      const amount = parseUnits(String(form.get("amount")), 6);
-      const paymentId = keccak256(stringToHex(invoice));
-      const hash = await writeContractAsync({
-        address: vault,
-        abi: arcGuardVaultAbi,
-        functionName: "spend",
-        args: [getAddress(recipient), amount, paymentId],
-        chainId: selectedChainId,
+      if (!amount) throw new Error("Amount is required.");
+      if (!address || !isOwner || !vaultAddress) {
+        throw new Error("Connect the current Owner wallet first.");
+      }
+
+      const issuedAt = Math.floor(Date.now() / 1000);
+      const authorizationMessage = [
+        "Arc Guardrails payment authorization",
+        `Network: ${selectedChainId}`,
+        `Vault: ${vaultAddress}`,
+        `Owner: ${getAddress(address)}`,
+        `Recipient: ${getAddress(recipient)}`,
+        `Amount: ${amount}`,
+        `Invoice: ${invoice}`,
+        `Issued at: ${issuedAt}`,
+      ].join("\n");
+
+      setNotice({
+        kind: "pending",
+        text: "Sign the payment authorization in your Owner wallet…",
       });
-      await settle(hash, "Agent payment");
+      const signature = await signMessageAsync({ message: authorizationMessage });
+      setNotice({ kind: "pending", text: "Agent API payment is confirming…" });
+      const response = await fetch("/api/agent/pay", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          recipient: getAddress(recipient),
+          amount,
+          invoice,
+          chainId: selectedChainId,
+          owner: getAddress(address),
+          authorization: { issuedAt, signature },
+        }),
+      });
+
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        detail?: string;
+        hash?: `0x${string}`;
+        network?: string;
+      };
+      if (!response.ok || !result.hash) {
+        throw new Error(result.detail ?? result.error ?? "Agent API payment failed.");
+      }
+
+      setNotice({
+        kind: "success",
+        text: `Agent API payment confirmed on ${result.network ?? chain.name}.`,
+        hash: result.hash,
+      });
+      await Promise.all([refetch(), refetchActivities()]);
+      formElement.reset();
     });
   }
 
@@ -826,7 +870,7 @@ export function Dashboard() {
                   <FormIntro
                     icon={<Bot size={18} />}
                     title="Agent payment"
-                    detail="Execute a replay-safe USDC payment."
+                    detail="Owner authorizes offchain; the server Agent EOA submits the transaction."
                   />
                   <Field
                     label="Recipient"
@@ -852,8 +896,8 @@ export function Dashboard() {
                     />
                   </div>
                   <SubmitButton
-                    label="Execute payment"
-                    disabled={!isAgent || isPreview}
+                    label="Pay via Agent API"
+                    disabled={!isOwner || isPreview}
                   />
                 </form>
               )}

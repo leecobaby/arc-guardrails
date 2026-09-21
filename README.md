@@ -18,7 +18,7 @@ Source repository: [github.com/leecobaby/arc-guardrails](https://github.com/leec
 
 - `ArcGuardVault`: non-upgradeable USDC vault with an allowlist, per-transaction limit, UTC daily limit, policy expiry, replay-safe payment IDs, pause/recovery, agent rotation, and two-step ownership transfer.
 - Operations console: Arc testnet/mainnet switching, MetaMask and other injected-wallet selection, vault funding, policy and recipient controls, agent payments, indexed activity history, pausing, and ownership transfer.
-- Authenticated agent endpoint: `POST /api/agent/pay` signs with a server-only agent key and lets the contract accept or reject the payment.
+- Agent payment endpoint: `POST /api/agent/pay` signs with a server-only Agent key. The console signs a short-lived Owner authorization message, then submits the payment through this endpoint; the contract still enforces every policy.
 - Contract tests for authorization, allowlists, replay protection, limits, day rollover, expiry, emergency withdrawal, agent rotation, and ownership transfer.
 
 ## Architecture
@@ -103,16 +103,16 @@ Rebuild the frontend after changing a `NEXT_PUBLIC_` value. Mainnet deployment c
 
 ## Agent payment API
 
-The endpoint requires `x-agent-api-key`. The private key never enters the browser bundle.
+The private key never enters the browser bundle. Console payments use a short-lived, offchain signature from the current Owner wallet; external automation must provide `x-agent-api-key`. The same `AGENT_PRIVATE_KEY` can be used on both Arc networks, while each request selects the target vault with `chainId`.
 
 ```bash
 curl -X POST http://localhost:3000/api/agent/pay \
   -H "content-type: application/json" \
   -H "x-agent-api-key: $AGENT_API_KEY" \
-  -d '{"recipient":"0x...","amount":"0.10","invoice":"research-api-042"}'
+  -d '{"chainId":5042002,"recipient":"0x...","amount":"0.10","invoice":"research-api-042"}'
 ```
 
-The agent must already be configured in the vault and hold enough native Arc USDC for gas. The recipient, amount, expiry, daily budget, and replay-safe invoice hash are still enforced by the contract.
+The Agent must already be configured in the selected vault and hold enough native Arc USDC for gas on that network. The recipient, amount, expiry, daily budget, and replay-safe invoice hash are still enforced by the contract. Deploy the same Agent EOA to both networks by funding the same private key separately on testnet and mainnet.
 
 ## Ownership handoff
 
