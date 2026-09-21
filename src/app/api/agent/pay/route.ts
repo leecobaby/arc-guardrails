@@ -180,6 +180,7 @@ export async function POST(request: NextRequest) {
       network: network.chain.name,
       hash,
       paymentId,
+      blockNumber: receipt.blockNumber.toString(),
       explorer: explorerUrl(network.chain.id, "tx", hash),
     });
   } catch (error) {

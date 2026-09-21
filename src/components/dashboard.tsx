@@ -21,7 +21,7 @@ import {
   ShieldCheck,
   UserRoundCog,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useMemo, useState } from "react";
 import {
   Address,
@@ -117,6 +117,7 @@ export function Dashboard() {
   const { address, isConnected } = useAccount();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
   const { signMessageAsync } = useSignMessage();
+  const queryClient = useQueryClient();
   const { writeContractAsync } = useWriteContract();
 
   const chain = selectedChainId === arc.id ? arc : arcTestnet;
@@ -214,6 +215,7 @@ export function Dashboard() {
     refetchInterval: 30_000,
     queryFn: async (): Promise<SpendRow[]> => {
       const response = await fetch(`/api/activity?chainId=${selectedChainId}`, {
+        cache: "no-store",
         signal: AbortSignal.timeout(8_000),
       });
       if (!response.ok) throw new Error("Activity index is unavailable.");
@@ -416,9 +418,11 @@ export function Dashboard() {
         error?: string;
         detail?: string;
         hash?: `0x${string}`;
+        paymentId?: `0x${string}`;
+        blockNumber?: string;
         network?: string;
       };
-      if (!response.ok || !result.hash) {
+      if (!response.ok || !result.hash || !result.paymentId || !result.blockNumber) {
         throw new Error(result.detail ?? result.error ?? "Agent API payment failed.");
       }
 
@@ -427,7 +431,34 @@ export function Dashboard() {
         text: `Agent API payment confirmed on ${result.network ?? chain.name}.`,
         hash: result.hash,
       });
-      await Promise.all([refetch(), refetchActivities()]);
+      const optimisticActivity: SpendRow = {
+        hash: result.hash,
+        recipient: getAddress(recipient),
+        amount: parseUnits(amount, 6),
+        paymentId: result.paymentId,
+        blockNumber: BigInt(result.blockNumber),
+      };
+      const activityQueryKey = [
+        "vault-activity",
+        selectedChainId,
+        vaultAddress,
+      ] as const;
+      const [, refreshedActivities] = await Promise.all([
+        refetch(),
+        refetchActivities(),
+      ]);
+      if (
+        !refreshedActivities.data?.some(
+          (activity) => activity.hash.toLowerCase() === result.hash?.toLowerCase(),
+        )
+      ) {
+        queryClient.setQueryData<SpendRow[]>(activityQueryKey, (current = []) => [
+          optimisticActivity,
+          ...current.filter(
+            (activity) => activity.hash.toLowerCase() !== optimisticActivity.hash.toLowerCase(),
+          ),
+        ].slice(0, 12));
+      }
       formElement.reset();
     });
   }

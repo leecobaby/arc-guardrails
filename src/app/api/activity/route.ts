@@ -84,7 +84,7 @@ export async function GET(request: Request) {
           "Blockscout-MCP-Pro-Api-Key": apiKey,
           "User-Agent": "Blockscout-SkillGuidedScript/0.6.0",
         },
-        next: { revalidate: 10 },
+        cache: "no-store",
       },
     );
     if (!response.ok) throw new Error(`Blockscout status ${response.status}`);
