@@ -6,6 +6,11 @@ loadEnv({ path: ".env.local" });
 
 export default defineConfig({
   plugins: [hardhatToolboxViemPlugin],
+  verify: {
+    blockscout: {
+      apiKey: configVariable("BLOCKSCOUT_PRO_API_KEY"),
+    },
+  },
   solidity: {
     profiles: {
       default: {

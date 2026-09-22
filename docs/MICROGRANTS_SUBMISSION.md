@@ -24,6 +24,7 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 - Live application: https://arc-guardrails.vercel.app
 - Public repository: https://github.com/leecobaby/arc-guardrails
 - Arc mainnet contract: `0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7`
+- Arc mainnet source verification: https://sourcify.dev/server/repo-ui/5042/0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7
 - Example mainnet transaction: `TBD`
 - Arc testnet contract (development only): `0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7`
 - Arc testnet payment (development only): `0xca34972b022d5c7983a9982e4e39c05233afdd8c25d46244381014ea1f19328f`
