@@ -1,0 +1,11 @@
+{
+  "network": "arcMainnet",
+  "chainId": 5042,
+  "contract": "0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7",
+  "deployer": "0xb76ce54db6dd26693815d0a7df8defdd2f151797",
+  "initialOwner": "0xE3608F65BD6D8b4f88b889a778D97a3F02e23d1A",
+  "usdc": "0x3600000000000000000000000000000000000000",
+  "transactionHash": "0x2b59e2895871faad8a73dfe044b406ede9f6719b872847a05874200603c9837a",
+  "blockNumber": "22134785",
+  "deployedAt": "2026-09-22T06:26:11.361Z"
+}
