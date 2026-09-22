@@ -1,5 +1,6 @@
 import "server-only";
 
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import {
   Address,
@@ -18,6 +19,7 @@ import { privateKeyToAccount } from "viem/accounts";
 
 import { arc, arcTestnet, explorerUrl } from "@/lib/arc";
 import { arcGuardVaultAbi } from "@/lib/contracts";
+import { activityCacheTag } from "@/lib/activity-cache";
 
 type PaymentRequest = {
   recipient?: string;
@@ -174,6 +176,7 @@ export async function POST(request: NextRequest) {
     });
     const hash = await walletClient.writeContract(transaction);
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    revalidateTag(activityCacheTag(String(network.chain.id), vault), { expire: 0 });
 
     return NextResponse.json({
       status: receipt.status,

@@ -64,6 +64,8 @@ The script refuses to overwrite an existing `.env.local`, writes secrets with mo
 
 For the activity ledger, set `BLOCKSCOUT_PRO_API_KEY` in `.env.local` and in your hosting provider's server-side environment. The key is sent only from `/api/activity` to Blockscout MCP, never bundled into the browser. The ledger reads the latest 12 `Spent` events from Blockscout's full indexed contract history, so it is not limited by the public RPC's recent-block log window. Do not prefix this variable with `NEXT_PUBLIC_`.
 
+Activity data is shared through the Next/Vercel data cache for 120 seconds, so ordinary visitors read the same cached snapshot instead of generating one Blockscout request each. After a confirmed Agent payment, the paying browser polls for that transaction for up to two minutes; once the event is indexed, the shared cache is invalidated and polling stops. A payment receipt is shown immediately while the indexer catches up.
+
 ## Networks
 
 | Network | Chain ID | RPC | Explorer |

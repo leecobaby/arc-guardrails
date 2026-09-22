@@ -1,7 +1,9 @@
-import { decodeEventLog, isAddress, isHex, toEventSelector, type Hex } from "viem";
+import { revalidateTag } from "next/cache";
+import { decodeEventLog, isAddress, isHex, toEventSelector, type Address, type Hex } from "viem";
 
 import { arc, arcTestnet } from "@/lib/arc";
 import { arcGuardVaultAbi } from "@/lib/contracts";
+import { activityCacheTag, cachedActivity } from "@/lib/activity-cache";
 
 const spentEvent = arcGuardVaultAbi.find(
   (item) => item.type === "event" && item.name === "Spent",
@@ -45,8 +47,50 @@ function parseSpentLog(value: unknown) {
   }
 }
 
+async function loadBlockscoutActivities(chainId: string, vaultAddress: string) {
+  const apiKey = process.env.BLOCKSCOUT_PRO_API_KEY;
+  if (!apiKey) throw new Error("Activity index is not configured.");
+
+  const params = new URLSearchParams({
+    chain_id: chainId,
+    endpoint_path: `/api/v2/addresses/${vaultAddress}/logs`,
+    "query_params[topic]": spentTopic,
+    "query_params[items_count]": "12",
+  });
+  const response = await fetch(
+    `https://mcp.blockscout.com/v1/direct_api_call?${params}`,
+    {
+      headers: {
+        "Blockscout-MCP-Pro-Api-Key": apiKey,
+        "User-Agent": "Blockscout-SkillGuidedScript/0.6.0",
+      },
+      cache: "no-store",
+    },
+  );
+  if (!response.ok) throw new Error(`Blockscout status ${response.status}`);
+
+  const result: unknown = await response.json();
+  if (
+    !result ||
+    typeof result !== "object" ||
+    !("data" in result) ||
+    !Array.isArray(result.data)
+  ) {
+    throw new Error("Invalid Blockscout response");
+  }
+
+  return result.data
+    .flatMap((log) => {
+      const row = parseSpentLog(log);
+      return row ? [row] : [];
+    })
+    .slice(0, 12);
+}
+
 export async function GET(request: Request) {
-  const chainId = new URL(request.url).searchParams.get("chainId");
+  const searchParams = new URL(request.url).searchParams;
+  const chainId = searchParams.get("chainId");
+  const afterHash = searchParams.get("after")?.toLowerCase();
   const vaultAddress =
     chainId === String(arc.id)
       ? process.env.NEXT_PUBLIC_MAINNET_VAULT_ADDRESS
@@ -61,51 +105,30 @@ export async function GET(request: Request) {
     return Response.json({ error: "Vault is not configured." }, { status: 404 });
   }
 
-  const apiKey = process.env.BLOCKSCOUT_PRO_API_KEY;
-  if (!apiKey) {
-    return Response.json(
-      { error: "Activity index is not configured." },
-      { status: 503 },
-    );
-  }
-
-  const params = new URLSearchParams({
-    chain_id: chainId,
-    endpoint_path: `/api/v2/addresses/${vaultAddress}/logs`,
-    "query_params[topic]": spentTopic,
-    "query_params[items_count]": "12",
-  });
+  const typedVaultAddress = vaultAddress as Address;
+  const forceRefresh = Boolean(afterHash);
 
   try {
-    const response = await fetch(
-      `https://mcp.blockscout.com/v1/direct_api_call?${params}`,
-      {
-        headers: {
-          "Blockscout-MCP-Pro-Api-Key": apiKey,
-          "User-Agent": "Blockscout-SkillGuidedScript/0.6.0",
-        },
-        cache: "no-store",
-      },
+    const activities = forceRefresh
+      ? await loadBlockscoutActivities(chainId, typedVaultAddress)
+      : await cachedActivity(chainId, typedVaultAddress, () =>
+          loadBlockscoutActivities(chainId, typedVaultAddress),
+        );
+    const indexed = Boolean(
+      afterHash && activities.some((activity) => activity.hash.toLowerCase() === afterHash),
     );
-    if (!response.ok) throw new Error(`Blockscout status ${response.status}`);
-
-    const result: unknown = await response.json();
-    if (
-      !result ||
-      typeof result !== "object" ||
-      !("data" in result) ||
-      !Array.isArray(result.data)
-    ) {
-      throw new Error("Invalid Blockscout response");
+    if (indexed) {
+      revalidateTag(activityCacheTag(chainId, typedVaultAddress), { expire: 0 });
     }
 
-    const activities = result.data
-      .flatMap((log) => {
-        const row = parseSpentLog(log);
-        return row ? [row] : [];
-      })
-      .slice(0, 12);
-    return Response.json({ activities });
+    return Response.json(
+      { activities, indexed: indexed || !afterHash },
+      {
+        headers: forceRefresh
+          ? { "Cache-Control": "no-store" }
+          : { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600" },
+      },
+    );
   } catch (error) {
     console.error("Unable to load vault activity:", error);
     return Response.json(

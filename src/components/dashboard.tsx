@@ -212,7 +212,8 @@ export function Dashboard() {
   } = useQuery({
     queryKey: ["vault-activity", selectedChainId, vaultAddress],
     enabled: Boolean(vaultAddress),
-    refetchInterval: 30_000,
+    staleTime: 120_000,
+    refetchInterval: 120_000,
     queryFn: async (): Promise<SpendRow[]> => {
       const response = await fetch(`/api/activity?chainId=${selectedChainId}`, {
         cache: "no-store",
@@ -235,6 +236,53 @@ export function Dashboard() {
       }));
     },
   });
+
+  async function refreshActivityAfterPayment(
+    hash: string,
+    queryKey: readonly unknown[],
+    optimisticActivity: SpendRow,
+  ) {
+    const waits = [0, 2_000, 5_000, 10_000, 20_000, 30_000, 45_000];
+    for (const waitMs of waits) {
+      if (waitMs > 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, waitMs));
+      }
+      try {
+        const response = await fetch(
+          `/api/activity?chainId=${selectedChainId}&after=${encodeURIComponent(hash)}`,
+          { cache: "no-store", signal: AbortSignal.timeout(8_000) },
+        );
+        if (!response.ok) continue;
+        const result = (await response.json()) as {
+          activities: Array<{
+            hash: string;
+            recipient: Address;
+            amount: string;
+            paymentId: string;
+            blockNumber: string;
+          }>;
+        };
+        const rows = result.activities.map((row) => ({
+          ...row,
+          amount: BigInt(row.amount),
+          blockNumber: BigInt(row.blockNumber),
+        }));
+        if (rows.some((row) => row.hash.toLowerCase() === hash.toLowerCase())) {
+          queryClient.setQueryData<SpendRow[]>(queryKey, rows);
+          return;
+        }
+      } catch {
+        // The indexer may briefly lag or the refresh request may time out.
+      }
+    }
+
+    queryClient.setQueryData<SpendRow[]>(queryKey, (current = []) => [
+      optimisticActivity,
+      ...current.filter(
+        (activity) => activity.hash.toLowerCase() !== optimisticActivity.hash.toLowerCase(),
+      ),
+    ].slice(0, 12));
+  }
 
   async function selectNetwork(chainId: number) {
     setSelectedChainId(chainId);
@@ -443,22 +491,14 @@ export function Dashboard() {
         selectedChainId,
         vaultAddress,
       ] as const;
-      const [, refreshedActivities] = await Promise.all([
-        refetch(),
-        refetchActivities(),
-      ]);
-      if (
-        !refreshedActivities.data?.some(
-          (activity) => activity.hash.toLowerCase() === result.hash?.toLowerCase(),
-        )
-      ) {
-        queryClient.setQueryData<SpendRow[]>(activityQueryKey, (current = []) => [
-          optimisticActivity,
-          ...current.filter(
-            (activity) => activity.hash.toLowerCase() !== optimisticActivity.hash.toLowerCase(),
-          ),
-        ].slice(0, 12));
-      }
+      await refetch();
+      queryClient.setQueryData<SpendRow[]>(activityQueryKey, (current = []) => [
+        optimisticActivity,
+        ...current.filter(
+          (activity) => activity.hash.toLowerCase() !== optimisticActivity.hash.toLowerCase(),
+        ),
+      ].slice(0, 12));
+      void refreshActivityAfterPayment(result.hash, activityQueryKey, optimisticActivity);
       formElement.reset();
     });
   }
