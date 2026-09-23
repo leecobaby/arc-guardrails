@@ -8,6 +8,8 @@ Live mainnet/testnet console: [arc-guardrails.vercel.app](https://arc-guardrails
 
 Source repository: [github.com/leecobaby/arc-guardrails](https://github.com/leecobaby/arc-guardrails)
 
+Arc Microgrants application: [DoraHacks BUIDL #49084](https://dorahacks.io/buidl/49084), submitted September 23, 2026. Submission status and evidence are recorded in [the application record](docs/MICROGRANTS_SUBMISSION.md).
+
 ## Mainnet proof
 
 - Network: Arc, chain ID `5042`.

@@ -1,6 +1,6 @@
 # Arc Guardrails — DoraHacks application
 
-Prepared September 23, 2026 for Arc Microgrants. These are application materials, not evidence of submission.
+Prepared and submitted September 23, 2026 for Arc Microgrants. Public BUIDL: https://dorahacks.io/buidl/49084. The [submission record](MICROGRANTS_SUBMISSION.md) captures the portal confirmation and Under Review status.
 
 ## Brand asset
 
@@ -47,3 +47,20 @@ Arc Guardrails is built by Leeco (GitHub: https://github.com/leecobaby), an inde
 ## Next milestone / use of grant
 
 Improve the reliability of payment execution and indexing, add stronger API abuse controls, and run more failure-path tests before expanding the prototype. A microgrant would support hosting, small onchain experiments, and documentation while I gather feedback from other Arc builders. A multi-user platform would be a later milestone rather than a claim about today's product.
+
+## Event-specific answers
+
+### In two sentences, what does your project do?
+
+Arc Guardrails lets an owner give an AI agent a USDC budget inside a vault that enforces approved recipients, per-payment and daily limits, expiry, and replay protection onchain. A working console and authenticated Agent API execute permitted payments on Arc mainnet while the owner retains control to pause spending, withdraw funds, and rotate the agent.
+
+### What does it use Arc for?
+
+Arc is the execution and settlement layer for the Solidity vault: it holds USDC, enforces spending policy, and publishes a Spent event for each permitted payment. The Agent uses USDC to pay gas as well as settlement value, keeping operational budgeting in one currency, and the console reads Arc contract state and indexed payment history. V1 has completed a real 0.01 USDC mainnet demonstration payment to the Owner's allowlisted address.
+
+### Applicant-confirmed eligibility answers
+
+- Deployed to Arc before this project: No.
+- Circle/Arc grant, bounty, or prize previously received for this project: No.
+- Team recruitment requested: No.
+- Track: All BUIDLs; category: Crypto / Web3; L1: Arc.

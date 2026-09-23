@@ -1,4 +1,15 @@
-# Arc Microgrants submission draft
+# Arc Microgrants submission record
+
+## Submission receipt
+
+- Submitted: September 23, 2026, through DoraHacks.
+- BUIDL: [Arc Guardrails #49084](https://dorahacks.io/buidl/49084).
+- Event: Arc Microgrants | Circle (event ID 2238).
+- Status at submission: **Under Review**. This does not mean approved or awarded.
+- Confirmation displayed: "BUIDL Submitted!" and "Your BUIDL Arc Guardrails has been submitted to hackathon Arc Microgrants | Circle and is now under review."
+- [Event submission status](https://dorahacks.io/hackathon/arc-microgrants/buidl).
+- Applicant account: leeco1917; public builder profile: https://github.com/leecobaby.
+- The applicant confirmed the organizer disclaimer and final submission agreements. Contact details were supplied privately in DoraHacks and are intentionally not stored in this public repository.
 
 ## Project
 
@@ -46,9 +57,9 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 - [x] Publish repository
 - [x] Publish live application
 - [x] Add public builder profile: https://github.com/leecobaby
-- [ ] Submit before October 14, 2026 at 23:59 ET
+- [x] Submit before October 14, 2026 at 23:59 ET
 
-The mainnet evidence, live URL, public repository, and public builder profile are available. Registration for the event and submission of a BUIDL are separate steps; only a portal confirmation counts as a completed application. Record the public BUIDL link and submission confirmation here after submission.
+Both event registration and project submission are complete. The portal confirmation and event listing were checked; the listing displayed Arc Guardrails as "Your BUIDL" with "Under Review" status. No award or payout has been confirmed.
 
 ## Official rules
 
