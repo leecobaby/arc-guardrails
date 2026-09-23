@@ -15,7 +15,7 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 ## Why it is worth taking further
 
 - Converts agent spending limits from an application promise into a contract invariant.
-- Works with injected wallets, Circle Agent Stack, or any EVM agent wallet.
+- V1 uses MetaMask for Owner controls and a server-side EOA for Agent execution; the contract can support other EVM signers. Circle wallet integration is future work.
 - Gives merchants final USDC settlement and gives owners replay-safe invoices and a public ledger.
 - Keeps the first deployment deliberately small, immutable, and auditable.
 
@@ -25,11 +25,13 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 - Public repository: https://github.com/leecobaby/arc-guardrails
 - Arc mainnet contract: `0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7`
 - Arc mainnet source verification: https://sourcify.dev/server/repo-ui/5042/0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7
-- Example mainnet transaction: `TBD`
+- Example mainnet transaction: https://explorer.arc.io/tx/0x8d43557cf6da9b5dae9e5dab81951557333e700ce5c8354f10c44556bf59e718 (0.01 USDC demonstration payment to the Owner, block 22145955)
 - Arc testnet contract (development only): `0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7`
 - Arc testnet payment (development only): `0xca34972b022d5c7983a9982e4e39c05233afdd8c25d46244381014ea1f19328f`
 - Public builder profile: `https://github.com/leecobaby`
-- Payout wallet on Arc: `TBD`
+- Payout wallet on Arc: to be confirmed by the applicant if requested; the deployed Vault is not a payout wallet.
+- Submission portal: https://dorahacks.io/hackathon/arc-microgrants
+- Application text: [DORAHACKS_APPLICATION.md](DORAHACKS_APPLICATION.md)
 
 ## Eligibility checklist
 
@@ -40,13 +42,13 @@ Arc is core to the product: USDC pays both application value and gas, determinis
 - [x] Testnet Vault configured and real restricted payment verified
 - [x] Public repository and live testnet console
 - [x] Deploy contract on Arc mainnet
-- [ ] Execute and link a small real Arc USDC transaction
-- [ ] Publish repository
-- [ ] Publish live application
-- [ ] Add an authorized public builder profile
+- [x] Execute and link a small real Arc USDC transaction
+- [x] Publish repository
+- [x] Publish live application
+- [x] Add public builder profile: https://github.com/leecobaby
 - [ ] Submit before October 14, 2026 at 23:59 ET
 
-Testnet-only projects are not eligible. The current project must not be submitted until the mainnet contract, live URL, public repository, and builder profile fields are complete.
+The mainnet evidence, live URL, public repository, and public builder profile are available. Registration for the event and submission of a BUIDL are separate steps; only a portal confirmation counts as a completed application. Record the public BUIDL link and submission confirmation here after submission.
 
 ## Official rules
 

@@ -2,17 +2,28 @@
 
 Arc Guardrails is an onchain USDC policy vault for autonomous agents. An owner funds a vault, assigns one agent wallet, approves recipients, and sets per-transaction, daily, and time limits. The contract enforces every payment independently of the model or wallet provider.
 
-The project targets the [Arc Microgrants program](https://community.arc.io/public/events/arc-microgrants-f8tijfjhyq). It is new work, open source, and designed for a small real Arc mainnet deployment.
+The project targets the [Arc Microgrants program](https://community.arc.io/public/events/arc-microgrants-f8tijfjhyq). V1 is an MIT-licensed prototype deployed on Arc mainnet and testnet, with a completed mainnet USDC payment.
 
-Live testnet console: [arc-guardrails.vercel.app](https://arc-guardrails.vercel.app)  
+Live mainnet/testnet console: [arc-guardrails.vercel.app](https://arc-guardrails.vercel.app) — select **Mainnet** to inspect the mainnet deployment. No wallet is needed to view activity.
+
 Source repository: [github.com/leecobaby/arc-guardrails](https://github.com/leecobaby/arc-guardrails)
+
+## Mainnet proof
+
+- Network: Arc, chain ID `5042`.
+- Vault: [`0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7`](https://explorer.arc.io/address/0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7).
+- [Deployment transaction](https://explorer.arc.io/tx/0x2b59e2895871faad8a73dfe044b406ede9f6719b872847a05874200603c9837a), September 22, 2026.
+- [Successful Agent payment of 0.01 USDC](https://explorer.arc.io/tx/0x8d43557cf6da9b5dae9e5dab81951557333e700ce5c8354f10c44556bf59e718), block `22145955`. This was a demonstration payment to the Owner's address, not a third-party commercial purchase.
+- [Source verified on Sourcify](https://sourcify.dev/server/repo-ui/5042/0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7). Blockscout verification is separate and has not yet been confirmed.
+
+Mainnet and testnet deployments happen to share an address; balances, permissions, and payment history are independent. This V1 demo uses one Owner and one Agent per Vault. Multi-user Factory/Registry support is a [V2 plan](docs/V2_UPGRADE_PLAN.md), not a shipped feature. The contracts have not received an external audit.
 
 ## Why Arc
 
 - Arc uses USDC for gas, so owners and agents do not need a separate volatile gas token.
 - The canonical USDC balance is available through the six-decimal ERC-20 interface at `0x3600000000000000000000000000000000000000`.
 - Deterministic sub-second finality makes API-scale agent payments auditable immediately.
-- Arc's EVM compatibility lets the same immutable policy contract work with injected wallets and Circle Agent Stack wallets.
+- Arc's EVM compatibility supports the Solidity vault and standard EVM wallet integrations. V1 uses MetaMask and a server-side EOA; Circle wallet integrations are future work.
 
 ## What ships
 
@@ -124,7 +135,7 @@ The contract inherits OpenZeppelin `Ownable2Step`:
 2. `pendingOwner` updates, but the current owner retains control.
 3. The specified address calls `acceptOwnership()`.
 
-The V1 testnet transfer is currently pending for the designated wallet. Open the verified contract in the [Arc Testnet Explorer](https://explorer.testnet.arc.io/address/0xA87Dc3978dB533daCfBD8aA85b9e3c77aFFdf1D7?tab=contract), connect the designated wallet, and call `acceptOwnership()` once. The current owner remains the deployer until that transaction confirms.
+The testnet handoff to `0xE3608F65BD6D8b4f88b889a778D97a3F02e23d1A` completed in [this acceptance transaction](https://explorer.testnet.arc.io/tx/0x8ac4d2511c3b9d3d89d283b0e74296de75484f9b1da5da085405730485871b60). The mainnet vault was deployed with that address as its initial Owner, so no mainnet handoff is required.
 
 Renouncing ownership is intentionally disabled so funds cannot be stranded. The initial temporary owner can therefore be replaced by the user's permanent address after review.
 
